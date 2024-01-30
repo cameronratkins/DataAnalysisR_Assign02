@@ -1,0 +1,150 @@
+---
+title: "Assignment 2"
+author: "Cameron Atkins"
+date: "2023-09-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+Build a function that takes a vector of size 500 (call the function and argument whatever you would
+like). If the vector is normally distributed, find the 95% confidence interval and print that to the console
+(use the cat() function). If the vector is not normally distrubted, print a message back to the console
+that the vector is not normally distributed. Regardless of distribution, plot the density of the vector.
+
+
+Run a test case on both functions where the data is normally distributed and one where the
+data is not. The best way would be to use some r<distribution>() functions (R has numerous
+distributions you can use to create vectors from with random values).
+```{r cars}
+
+confInterval <- function(v1){
+  vectorMean <- mean(v1)
+  standardError <- (qnorm(0.975)*sd(v1))/(sqrt(length(v1)))
+  confidence_interval <- c(vectorMean - standardError, vectorMean + standardError)
+  cat("95% Confidence Interval:", confidence_interval, "\n")
+}
+
+checkIfNormal <- function(v2){
+  isNormal <- shapiro.test(v2)
+
+  if (isNormal$p.value >= 0.05){
+    cat("Vector is normally distributed\n")
+    confInterval(v2)
+  }
+  
+  else{
+    cat("Vector is not normally distributed\n")
+  }
+
+# The Density Plot of vector passed to function
+  plot(density(v2))
+}
+
+# Test functions with data that is normal
+set.seed(123)  
+isNormal <- rnorm(500)
+checkIfNormal(isNormal)
+
+# Test functions with data that is not normal
+set.seed(456) 
+notNormal <- rexp(500, rate = 1)
+checkIfNormal(notNormal)
+```
+
+## Problem 2
+Create a function that accepts a dataset. For each column in the dataset, print a statement “<column
+name> is of type: <variable type>”. Test out your function on the dataset attached to this assignment
+(show the steps of reading in the dataset, you may need to use the str() function and make a class
+conversion for one of the variables).
+
+### Solution
+```{r}
+
+# Read in the dataset
+SampleData <- read.csv('dfex.csv')
+
+# Structure of Sample data before converting Date Column
+str(SampleData)
+
+# Converting Column x6 from chr to date
+SampleData$x6 <- as.Date(SampleData$x6)
+
+ColumnNameType <- function(ds){
+  columns <- colnames(ds)
+  
+  for (name in columns){
+    type <- class(ds[[name]])
+    
+    cat(name, "is of type: ", type, "\n")
+  }
+}
+
+# Structure of Sample data after converting Date Column to type Date
+str(SampleData)
+
+# Test the function with the sample dataset
+ColumnNameType(SampleData)
+```
+## Problem 3
+What does each function do? What does each function return? Come up with better names for these functions
+
+### Solution
+A. function f1 accepts two parameters, a string and prefix. The function returns true if "string" begins
+with "prefix" and false if it doesn't. A better name for this function would be beginsWithPrefix. Below is 
+an example of fuction f1 in use.
+```{r}
+f1 <- function(string, prefix) {
+  substr(string, 1, nchar(prefix)) == prefix
+}
+
+f1("mathematics", "math")
+f1("mathematics", "biol")
+```
+B. function f2 accepts one parameter, a vector or list. If the list has only one element, the function
+return NULL. If the list or vector has more than one element, the last element is removed. 
+
+A better name for this function would be removeLastElement.
+
+Below are two instances of function f2 executing.
+```{r}
+f2 <- function(x) {
+  if (length(x) <= 1) return(NULL)
+  x[-length(x)]
+}
+  
+names <- c("Djokovic", "Federer", "Nadal", "Tiafoe", "Alcaraz", "Murray")
+nums <- c(4005)
+
+f2(names)
+f2(nums)
+
+
+```
+C. function f3 accepts two vectors as parameters. Using the built-in replicate function(rep), 
+function f3 returns the second vector, y, matching the number of elements in the first vector, x.
+If the length of the y is less than the length of x, then elements in y will be repeated to until its length
+matches the length of x. If the length of x is greater than the length of y, elements in y will be removed to match the length of x. 
+
+A better name for this function would be matchesLength. 
+
+Below are four instances of f3 executing with vectors of various lengths.
+```{r}
+f3 <- function(x, y) {
+rep(y, length.out = length(x))
+}
+
+a <- c(1, 2, 3, 4, 5)
+b <- c(6)
+c <- c(7, 8, 9, 10, 11, 12, 13, 14, 15)
+
+f3(a, b)
+f3(a, c)
+f3(b, c)
+f3(c,a)
+```
+
